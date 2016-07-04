@@ -1,7 +1,7 @@
 # DXF2PNG8
 This applications helps in making a batch conversion from files in DXF to PNG8.
 
-The following tutorial apply only for owners of `Adobe Illustrator` and `Adobe Fireworks`.
+The following tutorial apply only for owners of `Adobe Illustrator`.
 The main issue in converting DXF is that all the construction lines need to be thick enough and the file as small as possible for an internet use.
 
 Convert DXF to PNG24
@@ -25,34 +25,24 @@ For runnig the conversion:
     * Fit to drawing sheet;
     * Combine levels.
 
-3. Run the script
+3. Run the script `File/Script/ExportDXF2PNG24` and supply asked parameters:
+
+	* File extensions
+	* Source Folder 
+	* Target Folder
+	* Stroke increase
 
 Convert PNG24 to PNG8
 ---------------------
-Once converted with illustrator, the photos need to be reprocessed in PNG8 to bring them to the proper size, in greyscale, with the right shade of gray.
-
-Copy the script `EnhanceBorder.jsf` to folder `C:\Program Files (x86)\Adobe\Adobe Fireworks CS6\Configuration\Commands\Batch Commands`.
-
-Now for having a PNG8 optimized file: 
-
-1. Open the folder with the PNG24 photos in Windows Explorer, sort photos by size and remove the photos that may exceed a proper size that could give errors during conversion.
-
-2. Browse the folder that contains the PNG24 photos with Adobe Bridge.
-
-3. Select batch conversion in `Adobe Fireworks` (File / Batch Processing), and enter the followings batch commands: 
-    
-    * Convert to Greyscale
-    * DarkenBorder.jsf
-    * Scale: "Scale to Fit Area" and set the size as desired 
-      (for my own files: `2DIMAGEREAR` and `3DIMAGE` to 975x549px; `2DIMAGESIZE` to 986x555px)
-    * Export: select `Custom format` (PNG 8, grayscale, 32 shades of gray)
- 
-4. Run the script
+For optimum conversion to PNG8 use the `pngquant` software on previous output folder:
+	
+	pngquant --speed 1 --verbose --ext new.png 4 *.png
 
 Other sources
 -------------
 *	[Extending Fireworks CS5](http://help.adobe.com/en_US/fireworks/cs/extend/fireworks_cs5_extending.pdf)
 *	[Illustrator CC scripting reference](http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/pdf/illustrator/scripting/CC/Illustrator%20Scripting%20Reference%20-%20JavaScript.pdf)
+*	[Pngquant](https://pngquant.org/)
 
 
 
