@@ -1,7 +1,7 @@
 # DXF2PNG8
 This applications helps in making a batch conversion from files in DXF to PNG8.
 
-The following tutorial apply only for `Adobe Illustrator` and `Adobe Fireworks`.
+The following tutorial apply only for owners of `Adobe Illustrator` and `Adobe Fireworks`.
 The main issue in converting DXF is that all the construction lines need to be thick enough and the file as small as possible for an internet use.
 
 Convert DXF to PNG24
@@ -9,7 +9,7 @@ Convert DXF to PNG24
 Copy the conversion plugin `ExportDXF2PNG24.jsx` to the folder `C:\Program Files\Adobe\Adobe Illustrator CC 2014\Presets\it_IT\Script`. 
 Now when you open Illustrator, you can find the option `ExportDXF2PNG24` in `File/Script` menu.
 
-For executing the conversion:
+For runnig the conversion:
 
 1. Open Illustrator.
 2. Create a new Document with these parameters:
