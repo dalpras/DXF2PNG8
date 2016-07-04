@@ -48,3 +48,11 @@ Now for having a PNG8 optimized file:
     * Export: select `Custom format` (PNG 8, grayscale, 32 shades of gray)
  
 4. Run the script
+
+Other sources
+-------------
+*	[Extending Fireworks CS5](http://help.adobe.com/en_US/fireworks/cs/extend/fireworks_cs5_extending.pdf)
+*	[Illustrator CC scripting reference](http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/pdf/illustrator/scripting/CC/Illustrator%20Scripting%20Reference%20-%20JavaScript.pdf)
+
+
+
