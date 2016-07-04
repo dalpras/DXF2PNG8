@@ -25,13 +25,17 @@ if (sourceFolder != null)
     fileType = prompt('Select type of Illustrator files to you want to process. Eg: *.dxf', '');
     // Get all files matching the pattern
     files = sourceFolder.getFiles(fileType);
-    app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
+    // app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
 
     if (files.length > 0) {
         // Get the destination to save the files
         destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
         for (i = 0; i < files.length; i++) {
             sourceDoc = app.open(files[i], DocumentColorSpace.RGB); // returns the document object
+            // don't overwrite existing files
+            if ( sourceDoc.exists == true ) {
+                continue;
+            }            
             var percent = prompt("Choose your %", "200", "Change width stroke");
             applyStroke(percent);
             
@@ -115,12 +119,6 @@ function artboardToPNGs() {
     }
     var matches = sourceDoc.name.match(/([a-z0-9_\-\.]+)\.DXF$/i);
     var pngFile = File(destFolder + '/' + matches[1] + '.png');
-
-    // don't overwrite existing files
-    if ( pngFile.exists ) {
-        return;
-    }
-
     var size   = 750;
     var artBds = sourceDoc.artboards;
     var idx    = artBds.getActiveArtboardIndex();
