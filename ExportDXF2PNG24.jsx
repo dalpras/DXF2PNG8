@@ -113,6 +113,14 @@ function artboardToPNGs() {
     if (app.documents.length == 0) {
         return;
     }
+    var matches = sourceDoc.name.match(/([a-z0-9_\-\.]+)\.DXF$/i);
+    var pngFile = File(destFolder + '/' + matches[1] + '.png');
+
+    // don't overwrite existing files
+    if ( pngFile.exists ) {
+        return;
+    }
+
     var size   = 750;
     var artBds = sourceDoc.artboards;
     var idx    = artBds.getActiveArtboardIndex();
@@ -125,8 +133,6 @@ function artboardToPNGs() {
     var pngOptions = getPngOptions();
     pngOptions.horizontalScale = pngOptions.verticalScale = scale;
     
-    var matches = sourceDoc.name.match(/([a-z0-9_\-\.]+)\.DXF$/i);
-    var pngFile = File(destFolder + '/' + matches[1] + '.png');
     sourceDoc.exportFile(pngFile, ExportType.PNG24, pngOptions);
 }
 
