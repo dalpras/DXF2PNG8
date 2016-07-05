@@ -1,15 +1,20 @@
 # DXF2PNG8
-This applications helps in making a batch conversion from files in DXF to PNG8.
+This applications make the best conversion possible from DXF to PNG8.
 
 The following tutorial apply only for owners of `Adobe Illustrator`.
-The main issue in converting DXF is that all the construction lines need to be thick enough and the file as small as possible for an internet use.
+I tried many solutions: Kabeja, Inkscape with Gcode, Dia, LibreOffice. None of these software keep all informations of the original DXF file. 
+
+Only Illustrator is able to keep all the information in particular when dealing with drawing dimensions.
+Illustrator has also some defects: the main issue in converting DXF is that many construction lines are not thick enough, thats why is better to apply a stroke to inner lines
+without altering dimensions.
+Furthermore when dealing with web, files need to be small as possible: `pngquant` is far better than Illustrator in PNG24 to PNG8 conversion.
 
 Convert DXF to PNG24
 --------------------
 Copy the conversion plugin `ExportDXF2PNG24.jsx` to the folder `C:\Program Files\Adobe\Adobe Illustrator CC 2014\Presets\it_IT\Script`. 
 Now when you open Illustrator, you can find the option `ExportDXF2PNG24` in `File/Script` menu.
 
-For runnig the conversion:
+For running the conversion:
 
 1. Open Illustrator.
 2. Create a new Document with these parameters:
@@ -27,10 +32,12 @@ For runnig the conversion:
 
 3. Run the script `File/Script/ExportDXF2PNG24` and supply asked parameters:
 
-	* File extensions
 	* Source Folder 
-	* Target Folder
+	* File extensions
 	* Stroke increase
+	* Target Folder
+
+4.	Wait until script has finished.
 
 Convert PNG24 to PNG8
 ---------------------
