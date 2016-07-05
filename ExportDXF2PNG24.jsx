@@ -4,39 +4,51 @@
  * @author Stefano Dal Prà
  */
 
-// uncomment to suppress Illustrator warning dialogs
+#target illustrator
 
-var destFolder,
-sourceDoc,
-targetFile,
-pngExportOpts,
-sizes;
+// The Document used for exporting must be outside the function for
+// avoiding page setup every time.
+var sourceDoc;
 
 // Select the source folder.
 var sourceFolder = Folder.selectDialog('Select the folder with Illustrator files you want to convert to PNG', '~');
-var strokePercent = prompt("Choose your %", "200", "Change width stroke");
+
+// Select files to convert.
 var fileType = prompt('Select type of Illustrator files to you want to process. (es: *.dxf)', '*.dxf');
-var files = new Array();
 
-// If a valid folder is selected
-if (sourceFolder != null) {
-	// Get all files matching the pattern
-	files = sourceFolder.getFiles(fileType);
-	// app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
+// Select stroke for lines
+var strokePercent = prompt("Choose your stroke line increase in percent (es. 0-infinite)", "200", "Change width stroke");
 
+// Get the destination to save the files
+var destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
+
+// Get all files matching the pattern
+var files = sourceFolder.getFiles(fileType);
+
+// If a valid folder is selected RUN
+if (sourceFolder != null && files.length > 0) {
+	main(files);
+}
+
+// uncomment to suppress Illustrator warning dialogs
+// app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
+
+function main(files) {
 	if (files.length > 0) {
-		// Get the destination to save the files
-		destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
-		for (i = 0; i < files.length; i++) {
-			sourceDoc = app.open(files[i], DocumentColorSpace.RGB); // returns the document object
-			// don't overwrite existing files
-			if (sourceDoc.exists == true) {
+		for (var i = 0; i < files.length; i++) {
+			var dxfFile = files[i],
+			pngFile = createPngFile(destFolder, dxfFile);
+			// don't overwrite existing files, skip as soon as possible
+			if (pngFile.exists == true) {
 				continue;
 			}
+
+			sourceDoc = this.app.open(dxfFile, DocumentColorSpace.RGB);
+
 			applyStroke(strokePercent);
 
 			// convert to png and save
-			artboardToPNGs();
+			exportDocToPng(pngFile, 750);
 
 			// close the original without saving
 			sourceDoc.close(SaveOptions.DONOTSAVECHANGES);
@@ -45,6 +57,13 @@ if (sourceFolder != null) {
 	} else {
 		alert('No matching files found');
 	}
+}
+/**
+ * Create a png file based on dxf path assigned.
+ */
+function createPngFile(destFolder, dxfFile) {
+	var matches = dxfFile.name.match(/([^\/]+)\.DXF$/i);
+	return new File(destFolder + '/' + matches[1] + '.png');
 }
 
 /**
@@ -55,7 +74,9 @@ if (sourceFolder != null) {
  * @returns {void}
  */
 function applyStroke(percent) {
-	var percentile = percent / 100;
+	var percentile = percent / 100,
+	black = new GrayColor();
+	black.gray = 100;
 
 	// choose all page elements
 	for (var i = 0; i < app.activeDocument.pageItems.length; i++) {
@@ -70,7 +91,7 @@ function applyStroke(percent) {
 
 				//transform the stroke width into % choose at start
 				objPath.strokeWidth = objStrokeWidth * percentile;
-				objPath.strokeColor = makeColor(0, 0, 0);
+				objPath.strokeColor = black;
 				// objPath.tracingMode = TRACINGMODEBLACKANDWHITE;
 				// objPath,threshold = 128;
 			}
@@ -78,7 +99,7 @@ function applyStroke(percent) {
 		if (myLayer.typename == "PathItem") {
 			var objStrokeWidth = myLayer.strokeWidth;
 			myLayer.strokeWidth = objStrokeWidth * percentile;
-			myLayer.strokeColor = makeColor(0, 0, 0);
+			myLayer.strokeColor = black;
 			// myLayer.tracingMode = TRACINGMODEBLACKANDWHITE;
 			// myLayer,threshold = 128;
 		}
@@ -104,38 +125,30 @@ function makeColor(r, g, b) {
 /**
  * Process the artboards inside the document applying a 30% size increase and exporting the png.
  *
+ * @param {File}
+ *
  * @returns {void}
  */
-function artboardToPNGs() {
-	if (parseFloat(app.version) < 15) {
-		return;
-	}
+function exportDocToPng(pngFile, minWidth) {
 	if (app.documents.length == 0) {
 		return;
 	}
-	var matches = sourceDoc.name.match(/([a-z0-9_\-\.]+)\.DXF$/i);
-	var pngFile = File(destFolder + '/' + matches[1] + '.png');
-	var size = 750;
 	var artBds = sourceDoc.artboards;
 	var idx = artBds.getActiveArtboardIndex();
-	// var abName  = artBds[ idx ].name;
 
-	// nel fattore scala definisco di aumentare di un 30% la dimensione dell'immagine DXF da elaborare,
-	var scale = (size / (artBds[idx].artboardRect[2] - artBds[idx].artboardRect[0])) * 100 * 1.3;
-	//pngFile = File( dF.fsName + '/' + abName + '_00' + sizes[j] + 'x' + sizes[j] + '.png' );
-
-	var pngOptions = getPngOptions();
-	pngOptions.horizontalScale = pngOptions.verticalScale = scale;
-
-	sourceDoc.exportFile(pngFile, ExportType.PNG24, pngOptions);
+	// scale the image to a minimum width of 750 and 30% increase
+	var scale = (minWidth / (artBds[idx].artboardRect[2] - artBds[idx].artboardRect[0])) * 100 * 1.3;
+	sourceDoc.exportFile(pngFile, ExportType.PNG24, getPngOptions(scale));
 }
 
 /**
- * Set the PNG saving options of the files using the PDFSaveOptions object.
+ * Set the PNG saving options of the files.
+ *
+ * @param {scale} Scale the image to the value specified
  *
  * @returns {ExportOptionsPNG24}
  */
-function getPngOptions() {
+function getPngOptions(scale) {
 	// PNG8
 	// var pngExportOpts = new ExportOptionsPNG8();
 	// pngExportOpts.colorCount = 4;
@@ -151,8 +164,8 @@ function getPngOptions() {
 	// pngExportOpts.matte = false;
 	// pngExportOpts.matteColor = 0, 0, 0;
 	// pngExportOpts.transparency = true;
-	// pngExportOpts.verticalScale = 416.667;
-	// pngExportOpts.horizontalScale = 416.667;
+	pngExportOpts.verticalScale = scale;
+	pngExportOpts.horizontalScale = scale;
 
 	return pngExportOpts;
 }
