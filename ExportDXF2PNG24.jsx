@@ -1,10 +1,15 @@
 ﻿/**
+ * @@@BUILDINFO@@@ ExportDXF2PNG24.jsx !Version! Wed Jul 06 2016 13:32:12 GMT+0200
+ *
  * Script for converting DXF to PNG with Illustrator
  *
  * @author Stefano Dal Prà
  */
 
-// #target illustrator
+#target illustrator
+
+// if $.level is set to 0 or 1, breakpoints are disabled
+$.level = 2;
 
 // The Document used for exporting must be outside the function for
 // avoiding page setup every time.
@@ -35,30 +40,54 @@ if (sourceFolder != null) {
 
 /**
  * Main processing function.
- * 
+ *
  * @param {Array} files Array of Files to process.
  */
 function main(files) {
 	//Append to LOGFILE
 	var logger = new File(Folder.desktop + "/illustrator-log.txt");
+	var hasLogger = false;
+	if (logger !== '') {
+		//Open the file for writing.
+		hasLogger = logger.open('a', undefined, undefined);
+		logger.encoding = "UTF-8";
+		logger.lineFeed = "Windows";
+	}
+	// got an output?
+	if (hasLogger === false) {
+		return;
+	}
+
 	var toDay = new Date();
-	logger.open("a", "TEXT");
-    logger.write("Start batch processing at " + toDay.getDate() + " " + toDay.getHours() + ":" + toDay.getMinutes() + ":" + toDay.getSeconds() + "\n");
+	logger.writeln("Start batch processing at " + toDay.toLocaleTimeString());
 
 	for (var i = 0; i < files.length; i++) {
 		var dxfFile = files[i],
 		pngFile = createPngFile(destFolder, dxfFile);
-		
+
 		// don't overwrite existing files, skip as soon as possible
 		if (pngFile.exists == true) {
 			continue;
 		}
 
 		//Write the info to the file
-		logger.write("Processing: " + pngFile.name + "\n");
-		
-		// uncomment to suppress Illustrator warning dialogs
+		logger.writeln("Processing: " + pngFile.name);
+
+		// uncomment to suppress Illustrator warning dialogsOpenOptionsAutoCAD
 		app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
+
+		// options for autocad documents
+		app.preferences.centerArtwork = true;
+		app.preferences.globalScaleOption = AutoCADGlobalScaleOption.FitArtboard;
+		//app.preferences.globalScaleOption = AutoCADGlobalScaleOption.ScaleByValue;
+		//app.preferences.globalScaleOption = AutoCADGlobalScaleOption.OriginalSize;
+		app.preferences.globalScalePercent = "100.0";
+		// dxfOptions.mergeLayers = true;
+		app.preferences.scaleLineweights = false;
+		app.preferences.unit = AutoCADUnit.Millimeters;
+		// dxfOptions.unit = AutoCADUnit.Pixels;
+		app.preferences.unitScaleRatio = "1.0";
+
 		sourceDoc = app.open(dxfFile, DocumentColorSpace.RGB);
 
 		applyStroke(strokePercent);
@@ -70,14 +99,14 @@ function main(files) {
 		sourceDoc.close(SaveOptions.DONOTSAVECHANGES);
 	}
 	//Close the log
-	logger.close();	
-	
+	logger.close();
+
 	alert('Files are saved as PNG in ' + destFolder);
 }
 
 /**
  * Create a png file based on dxf path assigned.
- * 
+ *
  * @param {string} Target PNG Folder PathItem
  * @param {File} Source DXF File to convert
  */
@@ -161,4 +190,3 @@ function exportFileToPNG24(pngFile, objScale) {
 		sourceDoc.exportFile(pngFile, type, exportOptions);
 	}
 }
-

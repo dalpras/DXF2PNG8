@@ -50,6 +50,7 @@ Other sources
 *	[Illustrator CC scripting reference](http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/pdf/illustrator/scripting/CC/Illustrator%20Scripting%20Reference%20-%20JavaScript.pdf)
 *	[Append to an existing text file using Photoshop Scripting](http://stackoverflow.com/questions/18240838/append-to-an-existing-text-file-using-photoshop-scripting-jsx)
 *	[John's Scripts  4  Adobe Illustrator](http://www.wundes.com/JS4AI/)
+*	[Welcome to the extendscript.wiki!](https://github.com/ExtendScript/wiki/wiki)
 *	[Pngquant](https://pngquant.org/)
 
 
