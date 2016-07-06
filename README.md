@@ -47,7 +47,7 @@ For optimum conversion to PNG8 use the `pngquant` software on previous output fo
 
 Other sources
 -------------
-*	[Extending Fireworks CS5](http://help.adobe.com/en_US/fireworks/cs/extend/fireworks_cs5_extending.pdf)
+*	[John's Scripts  4  Adobe Illustrator](http://www.wundes.com/JS4AI/)
 *	[Illustrator CC scripting reference](http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/pdf/illustrator/scripting/CC/Illustrator%20Scripting%20Reference%20-%20JavaScript.pdf)
 *	[Pngquant](https://pngquant.org/)
 

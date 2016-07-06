@@ -39,6 +39,11 @@ if (sourceFolder != null) {
  * @param {Array} files Array of Files to process.
  */
 function main(files) {
+	//Append to LOGFILE
+	var logger = new File(Folder.desktop + "/illustrator-log.txt");
+	var toDay = new Date();
+	logger.open("a", "Start batch processing at " + toDay.getDate() + " " + toDay.getHours() + ":" + toDay.getMinutes() + ":" + toDay.getSeconds() + "\n");
+
 	for (var i = 0; i < files.length; i++) {
 		var dxfFile = files[i],
 		pngFile = createPngFile(destFolder, dxfFile);
@@ -47,6 +52,9 @@ function main(files) {
 		if (pngFile.exists == true) {
 			continue;
 		}
+
+		//Write the info to the file
+		logger.write("Processing: " + pngFile.name + "\r");
 		
 		// uncomment to suppress Illustrator warning dialogs
 		app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
@@ -60,6 +68,9 @@ function main(files) {
 		// close the original without saving
 		sourceDoc.close(SaveOptions.DONOTSAVECHANGES);
 	}
+	//Close the log
+	logger.close();	
+	
 	alert('Files are saved as PNG in ' + destFolder);
 }
 
