@@ -77,20 +77,22 @@ function main(files) {
 		app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
 
 		// options for autocad documents
-		app.preferences.centerArtwork = true;
-		app.preferences.globalScaleOption = AutoCADGlobalScaleOption.FitArtboard;
-		//app.preferences.globalScaleOption = AutoCADGlobalScaleOption.ScaleByValue;
-		//app.preferences.globalScaleOption = AutoCADGlobalScaleOption.OriginalSize;
-		app.preferences.globalScalePercent = "100.0";
-		// dxfOptions.mergeLayers = true;
-		app.preferences.scaleLineweights = false;
-		app.preferences.unit = AutoCADUnit.Millimeters;
-		// dxfOptions.unit = AutoCADUnit.Pixels;
-		app.preferences.unitScaleRatio = "1.0";
+		with (app.preferences) {
+			centerArtwork = true;
+			globalScaleOption = AutoCADGlobalScaleOption.FitArtboard;
+			//globalScaleOption = AutoCADGlobalScaleOption.ScaleByValue;
+			//globalScaleOption = AutoCADGlobalScaleOption.OriginalSize;
+			globalScalePercent = "100.0";
+			// mergeLayers = true;
+			scaleLineweights = false;
+			unit = AutoCADUnit.Millimeters;
+			// unit = AutoCADUnit.Pixels;
+			unitScaleRatio = "1.0";
+		}
 
 		sourceDoc = app.open(dxfFile, DocumentColorSpace.RGB);
-
-		applyStroke(strokePercent);
+		// alert(countPathItems());
+		// applyStroke(strokePercent);
 
 		// convert to png and save
 		exportDocToPng(pngFile, 750);
@@ -116,6 +118,41 @@ function createPngFile(destFolder, dxfFile) {
 }
 
 /**
+ * Iterate through all document pathItems and apply a callback 
+ * function to all pathItems found.
+ *
+ * @param {function} Function to apply to pathItem found.
+ */
+function loopDocumentPathItems(callback) {
+	if (callback !== undefined && typeof callback == 'function') {
+		// choose all page elements
+		for (var i = 0; i < app.activeDocument.pageItems.length; i++) {
+			var myLayer = app.activeDocument.pageItems[i];
+			//if element is compound make a new loop for pathItems
+			if (myLayer.typename == "CompoundPathItem") {
+				for (var u = 0; u < myLayer.pathItems.length; u++) {
+					var objPath = myLayer.pathItems[u];
+					callback(objPath);
+				}
+			}
+			if (myLayer.typename == "PathItem") {
+				callback(myLayer);
+			}
+		}
+	}
+}
+/**
+ * Count the number of pathItems in the document
+ */
+function countPathItems() {
+	var num = 0;
+	loopDocumentPathItems(function(pathItem) {
+		num++;
+	});	
+	return num;
+}
+
+/**
  * Apply a stroke effect in each element composing the object.
  *
  * @param {int} percent Percent of stroke increment
@@ -124,32 +161,14 @@ function applyStroke(percent) {
 	var percentile = percent / 100,
 	black = new GrayColor();
 	black.gray = 100;
-
-	// choose all page elements
-	for (var i = 0; i < app.activeDocument.pageItems.length; i++) {
-		var myLayer = app.activeDocument.pageItems[i];
-		//if element is compound make a new loop for pathItems
-		if (myLayer.typename == "CompoundPathItem") {
-			for (var u = 0; u < myLayer.pathItems.length; u++) {
-				//take actual stroke size
-				var objPath = myLayer.pathItems[u];
-				var objStrokeWidth = objPath.strokeWidth;
-
-				//transform the stroke width into % choose at start
-				objPath.strokeWidth = objStrokeWidth * percentile;
-				objPath.strokeColor = black;
-				// objPath.tracingMode = TRACINGMODEBLACKANDWHITE;
-				// objPath.threshold = 128;
-			}
-		}
-		if (myLayer.typename == "PathItem") {
-			var objStrokeWidth = myLayer.strokeWidth;
-			myLayer.strokeWidth = objStrokeWidth * percentile;
-			myLayer.strokeColor = black;
-			// myLayer.tracingMode = TRACINGMODEBLACKANDWHITE;
-			// myLayer.threshold = 128;
-		}
-	}
+	loopDocumentPathItems(function(pathItem) {
+		var objStrokeWidth = pathItem.strokeWidth;
+		//transform the stroke width into % choose at start
+		pathItem.strokeWidth = objStrokeWidth * percentile;
+		pathItem.strokeColor = black;
+		// objPath.tracingMode = TRACINGMODEBLACKANDWHITE;
+		// objPath.threshold = 128;		
+	});
 }
 
 /**
@@ -180,13 +199,14 @@ function exportFileToPNG24(pngFile, objScale) {
 	if (app.documents.length > 0) {
 		var exportOptions = new ExportOptionsPNG24();
 		var type = ExportType.PNG24;
-
-		exportOptions.antiAliasing = true;
-		// exportOptions.artBoardClipping = false;
-		exportOptions.transparency = true;
-		// exportOptions.saveAsHTML = false;
-		exportOptions.verticalScale = objScale;
-		exportOptions.horizontalScale = objScale;
+		with (exportOptions) {
+			antiAliasing = true;
+			// artBoardClipping = false;
+			transparency = true;
+			// saveAsHTML = false;
+			verticalScale = objScale;
+			horizontalScale = objScale;
+		}
 		sourceDoc.exportFile(pngFile, type, exportOptions);
 	}
 }
