@@ -27,6 +27,9 @@ var strokePercent = prompt("Choose your stroke line increase in percent (es. 0-i
 // Get the destination to save the files
 var destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
 
+// File process logger
+var logger = new File(Folder.desktop + "/illustrator-log.txt");
+
 // If a valid folder is selected RUN
 if (sourceFolder != null) {
 	// Get all files matching the pattern
@@ -44,23 +47,7 @@ if (sourceFolder != null) {
  * @param {Array} files Array of Files to process.
  */
 function main(files) {
-	//Append to LOGFILE
-	var logger = new File(Folder.desktop + "/illustrator-log.txt");
-	var hasLogger = false;
-	if (logger !== '') {
-		//Open the file for writing.
-		hasLogger = logger.open('a', undefined, undefined);
-		logger.encoding = "UTF-8";
-		logger.lineFeed = "Windows";
-	}
-	// got an output?
-	if (hasLogger === false) {
-		return;
-	}
-
-	var toDay = new Date();
-	logger.writeln("Start batch processing at " + toDay.toLocaleTimeString());
-
+	
 	for (var i = 0; i < files.length; i++) {
 		var dxfFile = files[i],
 		pngFile = createPngFile(destFolder, dxfFile);
@@ -71,8 +58,8 @@ function main(files) {
 		}
 
 		//Write the info to the file
-		logger.writeln("Processing: " + pngFile.name);
-
+		log(dxfFile.name);
+		
 		// uncomment to suppress Illustrator warning dialogsOpenOptionsAutoCAD
 		app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
 
@@ -92,7 +79,9 @@ function main(files) {
 
 		sourceDoc = app.open(dxfFile, DocumentColorSpace.RGB);
 		// alert(countPathItems());
-		// applyStroke(strokePercent);
+		
+		// very CPU intensive!
+		applyStroke(strokePercent);
 
 		// convert to png and save
 		exportDocToPng(pngFile, 750);
@@ -100,10 +89,30 @@ function main(files) {
 		// close the original without saving
 		sourceDoc.close(SaveOptions.DONOTSAVECHANGES);
 	}
-	//Close the log
-	logger.close();
-
 	alert('Files are saved as PNG in ' + destFolder);
+}
+
+/**
+ * Save a message to logfile.
+ *
+ * @param {string} message
+ */
+function log(message) {
+	var hasLogger = false;
+	if (logger !== '') {
+		//Open the file for writing.
+		hasLogger = logger.open('a', undefined, undefined);
+		logger.encoding = "UTF-8";
+		logger.lineFeed = "Windows";
+	}
+	// got an output?
+	if (hasLogger === false) {
+		return;
+	}
+	var toDay = new Date();
+	logger.writeln(toDay.toLocaleTimeString() + ": " + message);
+	//Close the log
+	logger.close();	
 }
 
 /**
