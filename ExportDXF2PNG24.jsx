@@ -28,7 +28,7 @@ var strokePercent = prompt("Choose your stroke line increase in percent: >= 0 (v
 // Select stroke for lines
 if (strokePercent > 0) {
 	// ask if stroke has to be skipped for the first file processed
-	skipFileStroke = prompt("Skip stroke for the first file in directory: Y/N", "N");
+	skipFileStroke = prompt("Skip stroke for the first file been processed: Y/N", "N");
 }
 
 // Get the destination to save the files
