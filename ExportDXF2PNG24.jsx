@@ -13,7 +13,8 @@ $.level = 2;
 
 // The Document used for exporting must be outside the function for
 // avoiding page setup every time.
-var sourceDoc;
+var sourceDoc,
+	skipFileStroke = 'N'; // set stroke for all files
 
 // Select the source folder.
 var sourceFolder = Folder.selectDialog('Select the folder with Illustrator files you want to convert to PNG', '~');
@@ -23,6 +24,12 @@ var fileType = prompt('Select type of Illustrator files to you want to process. 
 
 // Select stroke for lines
 var strokePercent = prompt("Choose your stroke line increase in percent: >= 0 (very CPU intensive! enter 0 if your PC is not fast enough)", "200", "Change width stroke");
+
+// Select stroke for lines
+if (strokePercent > 0) {
+	// ask if stroke has to be skipped for the first file processed
+	skipFileStroke = prompt("Skip stroke for the first file in directory: Y/N", "N");
+}
 
 // Get the destination to save the files
 var destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
@@ -80,10 +87,13 @@ function main(files) {
 		sourceDoc = app.open(dxfFile, DocumentColorSpace.RGB);
 		// alert(countPathItems());
 		
-		// very CPU intensive!
-		if (strokePercent > 0) {
+		// in the first loop skipFileStroke allow to skip stroking
+		if (strokePercent > 0 && skipFileStroke == 'N') {
+			// very CPU intensive!
 			applyStroke(strokePercent);
 		}
+		// for next loop stroking is setted again, as far as strokePercent > 0
+		skipFileStroke = 'N';
 
 		// convert to png and save
 		exportDocToPng(pngFile, 750);
