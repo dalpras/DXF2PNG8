@@ -22,7 +22,7 @@ var sourceFolder = Folder.selectDialog('Select the folder with Illustrator files
 var fileType = prompt('Select type of Illustrator files to you want to process. (es: *.dxf)', '*.dxf');
 
 // Select stroke for lines
-var strokePercent = prompt("Choose your stroke line increase in percent (es. 0-infinite)", "200", "Change width stroke");
+var strokePercent = prompt("Choose your stroke line increase in percent: >= 0 (very CPU intensive! enter 0 if your PC is not fast enough)", "200", "Change width stroke");
 
 // Get the destination to save the files
 var destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
@@ -81,7 +81,9 @@ function main(files) {
 		// alert(countPathItems());
 		
 		// very CPU intensive!
-		applyStroke(strokePercent);
+		if (strokePercent > 0) {
+			applyStroke(strokePercent);
+		}
 
 		// convert to png and save
 		exportDocToPng(pngFile, 750);
