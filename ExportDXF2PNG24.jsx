@@ -13,26 +13,26 @@ $.level = 2;
 
 // The Document used for exporting must be outside the function for
 // avoiding page setup every time.
-var sourceDoc,
+var sourceDoc, // = app.documents.add( null , 1920,1080),
 	skipFileStroke = 'N'; // set stroke for all files
-
+	
 // Select the source folder.
-var sourceFolder = Folder.selectDialog('Select the folder with Illustrator files you want to convert to PNG', '~');
+var sourceFolder = Folder.selectDialog('Select the folder with Illustrator files you want to convert to PNG24', '~');
 
 // Select files to convert.
-var fileType = prompt('Select type of Illustrator files to you want to process. (es: *.dxf)', '*.dxf');
+var fileType = prompt('Choose the file type to process:', '*.dxf');
 
 // Select stroke for lines
-var strokePercent = prompt("Choose your stroke line increase in percent: >= 0 (very CPU intensive! enter 0 if your PC is not fast enough)", "200", "Change width stroke");
+var strokePercent = prompt("Choose your stroke line increase in percent ( >=0, very CPU intensive. Enter 0 if your PC is not fast enough)", "200");
 
 // Select stroke for lines
 if (strokePercent > 0) {
 	// ask if stroke has to be skipped for the first file processed
-	skipFileStroke = prompt("Skip stroke for the first file been processed: Y/N", "N");
+	skipFileStroke = prompt("Skip stroke for the first file been processed (Y/N)?", "N");
 }
 
 // Get the destination to save the files
-var destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG files.', '~');
+var destFolder = Folder.selectDialog('Select the folder where you want to save the converted PNG24 files.', '~');
 
 // File process logger
 var logger = new File(Folder.desktop + "/illustrator-log.txt");
@@ -186,9 +186,10 @@ function applyStroke(percent) {
 		var objStrokeWidth = pathItem.strokeWidth;
 		//transform the stroke width into % choose at start
 		pathItem.strokeWidth = objStrokeWidth * percentile;
+		// log("Stroke " + objStrokeWidth + " to " + pathItem.strokeWidth);
 		pathItem.strokeColor = black;
-		// objPath.tracingMode = TRACINGMODEBLACKANDWHITE;
-		// objPath.threshold = 128;		
+		// pathItem.tracingMode = TracingModeType.TRACINGMODEBLACKANDWHITE;
+		// pathItem.threshold = 128;		
 	});
 }
 
